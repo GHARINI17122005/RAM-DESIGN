@@ -1,0 +1,52 @@
+TESTBENCH FOR RAM DESIGN
+
+
+`timescale 1ns/1ps
+
+module RAM_TB;
+
+    reg clk;
+    reg we;
+    reg [3:0] addr;
+    reg [7:0] din;
+    wire [7:0] dout;
+
+    // Instantiate RAM
+    SYNC_RAM uut (
+        .clk(clk),
+        .we(we),
+        .addr(addr),
+        .din(din),
+        .dout(dout)
+    );
+
+    // Clock generation: 10ns period
+    always #5 clk = ~clk;
+
+    initial begin
+        // Waveform generation
+        $dumpfile("ram_wave.vcd");
+        $dumpvars(0, RAM_TB);
+
+        clk = 0;
+
+        // ----------------------
+        // WRITE OPERATIONS
+        // ----------------------
+
+        we = 1; addr = 4'd2; din = 8'hA5; #10;   // Write A5 at address 2
+        we = 1; addr = 4'd5; din = 8'h3C; #10;   // Write 3C at address 5
+        we = 1; addr = 4'd8; din = 8'hFF; #10;   // Write FF at address 8
+
+        // ----------------------
+        // READ OPERATIONS
+        // ----------------------
+
+        we = 0; addr = 4'd2; #10;   // Read from addr 2 → A5
+        we = 0; addr = 4'd5; #10;   // Read from addr 5 → 3C
+        we = 0; addr = 4'd8; #10;   // Read from addr 8 → FF
+
+        $finish;
+    end
+
+endmodule
